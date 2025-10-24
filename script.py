@@ -6,6 +6,19 @@ import random
 
 header = ["Model", "Wynik", "Czas"]
 
+VALID_MONTHS = [
+    "styczen", "luty", "marzec", "kwiecien", "maj", "czerwiec",
+    "lipiec", "sierpien", "wrzesien", "pazdziernik", "listopad", "grudzien"
+]
+
+VALID_DAYS = ["pn", "wt", "sr", "cz", "pt", "so", "nd"]
+
+# Returns an ArgumentParser configured to read:
+# - months
+# - days
+# - time
+# - mode: operation mode, either "create" to generate files or "read" to read existing files (default is "read")
+# Examples are in main 
 def read_args(): 
         parser = argparse.ArgumentParser(
                 description="Script to generate or read catalog structure based on months, days, and time of day."
@@ -121,16 +134,33 @@ def write_to_csv(path: Path):
                 writer.writeheader()
                 writer.writerow(generate_random())
 
-
-if __name__ == "__main__":
-        parser = read_args()
-        args = parser.parse_args()
-        
+# Check if months and days are in VALID_DAYS and months are in VALID_MONTHS
+def verify_args(args):
         if len(args.months) != len(set(args.months)):
                 sys.exit("Months must be distinct")
 
         if len(args.months) != len(args.days):
                 sys.exit("Number of days must be equal to number of months")
+        
+        for m in args.months:
+                if m not in VALID_MONTHS:
+                        sys.exit("Invalid month")
+        
+        for day_entry in args.days:
+                if '-' in day_entry:
+                        start, end = day_entry.split('-', 1)
+                        if start not in VALID_DAYS or end not in VALID_DAYS:
+                                sys.exit(f"Invalid day range: {day_entry}")         
+                else:
+                        if day_entry not in VALID_DAYS:
+                                sys.exit(f"Invalid day: {day_entry}")
+        
+
+if __name__ == "__main__":
+        parser = read_args()
+        args = parser.parse_args()
+        
+        verify_args(args)
         
         # Verified program arguments
         days = args.days
