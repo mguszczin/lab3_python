@@ -116,7 +116,7 @@ def read_csv_time(path : Path):
 
                 return time_value
 
-def generate_random():
+def generate_random_csv_entry():
         return {
                 header[0] : random.choice(["A", "B", "C"]),
                 header[1] : random.randint(0, 1000),
@@ -132,9 +132,9 @@ def write_to_csv(path: Path):
         with open(path, "w", newline='') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=header, delimiter=';')
                 writer.writeheader()
-                writer.writerow(generate_random())
+                writer.writerow(generate_random_csv_entry())
 
-# Check if months and days are in VALID_DAYS and months are in VALID_MONTHS
+# Check if months and days are in VALID_DAYS and months are in VALID_MONTHS + check len
 def verify_args(args):
         if len(args.months) != len(set(args.months)):
                 sys.exit("Months must be distinct")
@@ -156,6 +156,10 @@ def verify_args(args):
                                 sys.exit(f"Invalid day: {day_entry}")
         
 
+# Already implemented:
+# - write_to_csv(path): writes data to a CSV file at the given path
+# - read_csv_time(path): reads time data from a CSV file at the given path
+# - reading & verification of arguments: parses command-line arguments and validates months/days/time
 if __name__ == "__main__":
         parser = read_args()
         args = parser.parse_args()
