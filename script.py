@@ -1,10 +1,56 @@
 from pathlib import Path
+import argparse
 import sys
 import csv
 import random
 
 header = ["Model", "Wynik", "Czas"]
 
+def read_args(): 
+        parser = argparse.ArgumentParser(
+                description="Script to generate or read catalog structure based on months, days, and time of day."
+        )
+        
+        parser.add_argument(
+                "-m", "--months",
+                nargs="+",  
+                required=True,
+                help="List of months to include, e.g., styczeń luty marzec"
+        )
+        
+        parser.add_argument(
+                "-d", "--days",
+                nargs="+",
+                required=True,
+                help="List of days corresponding to each month, e.g., pn-wt(ranges are allowed) pt"
+        )
+        
+        parser.add_argument(
+        "-t", "--time",
+        nargs="*",  
+        default=[],  
+        help="Time of day for each day (r=morning, w=evening). Default is morning."
+        )
+        
+        group = parser.add_mutually_exclusive_group(required=False)
+        group.add_argument(
+                "-c", "--create",
+                dest="mode",
+                action="store_const",
+                const="create",
+                help="Create files"
+        )
+        group.add_argument(
+                "-r", "--read",
+                dest="mode",
+                action="store_const",
+                const="read",
+                help="Read files"
+        )
+
+        parser.set_defaults(mode="read")  
+        return parser
+        
 # function used by : read_csv_time, write_to_csv
 # @param1 path to file or directory
 # if the path isn't directory or file -> program terminates
@@ -27,7 +73,9 @@ def verify_header(fieldnames):
 
 # Returns time from csv file
 # Returns 0 for invalid path
-# Exits if invalid path (file, or directory doesn't exist)
+# Exits if 
+# - invalid path (file, or directory doesn't exist)
+# - invalid file format
 def read_csv_time(path : Path):
         
         path = get_path(path)
@@ -74,9 +122,22 @@ def write_to_csv(path: Path):
                 writer.writerow(generate_random())
 
 
-
 if __name__ == "__main__":
-        #p = Path(".")
-        #write_to_csv(p)
-        #print(read_csv_time(p))
-    
+        parser = read_args()
+        args = parser.parse_args()
+        
+        if len(args.months) != len(set(args.months)):
+                sys.exit("Months must be distinct")
+
+        if len(args.months) != len(args.days):
+                sys.exit("Number of days must be equal to number of months")
+        
+        # Verified program arguments
+        days = args.days
+        months = args.months
+        times = args.time
+        
+        if args.mode == "create":
+                print("Hi")
+        elif args.mode == "read":
+                print("Hello")
