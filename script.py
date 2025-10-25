@@ -105,8 +105,6 @@ def verify_header(fieldnames):
 def read_csv_time(path: Path):
 
     path = get_path(path)
-    if not path.exists():
-        sys.exit(f"Invalid path specified: {path}")
 
     with open(path, newline='') as csv_file:
         reader = csv.DictReader(csv_file, delimiter=';')
